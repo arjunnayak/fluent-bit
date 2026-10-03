@@ -44,6 +44,7 @@
 #define FLB_TAIL_METRIC_M_TRUNCATED 103  /* number of truncated occurrences of multiline */
 #define FLB_TAIL_METRIC_L_TRUNCATED 104  /* number of truncated occurrences of long lines */
 #define FLB_TAIL_METRIC_L_SKIPPED 105  /* number of skipped occurrences of long lines */
+#define FLB_TAIL_METRIC_P_ABANDONED_BYTES 106  /* bytes abandoned on rotated file purge */
 #endif
 
 struct flb_tail_config {
@@ -175,6 +176,7 @@ struct flb_tail_config {
     struct cmt_counter *cmt_multiline_truncated;
     struct cmt_counter *cmt_long_line_truncated;
     struct cmt_counter *cmt_long_line_skipped;
+    struct cmt_counter *cmt_purge_abandoned_bytes;
 #endif
 
     /* Hash: hash tables for quick acess to registered files */
