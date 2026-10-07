@@ -2481,6 +2481,9 @@ int flb_tail_file_purge(struct flb_input_instance *ins,
     struct flb_tail_config *ctx = context;
     time_t now;
     struct stat st;
+#ifdef FLB_HAVE_METRICS
+    uint64_t abandoned_bytes;
+#endif
 
     /* Rotated files */
     now = time(NULL);
@@ -2498,6 +2501,18 @@ int flb_tail_file_purge(struct flb_input_instance *ins,
                                  "ingestion is paused, consider increasing "
                                  "rotate_wait");
                 }
+#ifdef FLB_HAVE_METRICS
+                if (st.st_size > file->offset) {
+                    abandoned_bytes = (uint64_t) (st.st_size - file->offset);
+                    cmt_counter_add(ctx->cmt_purge_abandoned_bytes, cfl_time_now(),
+                                    (double) abandoned_bytes, 1,
+                                    (char *[]) {flb_input_name(ctx->ins)});
+
+                    /* Old api */
+                    flb_metrics_sum(FLB_TAIL_METRIC_P_ABANDONED_BYTES,
+                                    abandoned_bytes, ctx->ins->metrics);
+                }
+#endif
             }
             else {
                 flb_plg_debug(ctx->ins,
