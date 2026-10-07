@@ -522,6 +522,10 @@ struct flb_tail_config *flb_tail_config_create(struct flb_input_instance *ins,
                                "Total bytes left unread when a rotated file is purged",
                                1, (char *[]) {"name"});
 
+    /* Initialize to 0 so the first increment is visible to rate()/increase() */
+    cmt_counter_set(ctx->cmt_purge_abandoned_bytes, cfl_time_now(), 0,
+                    1, (char *[]) {(char *) flb_input_name(ins)});
+
     /* OLD metrics */
     flb_metrics_add(FLB_TAIL_METRIC_F_OPENED,
                     "files_opened", ctx->ins->metrics);
